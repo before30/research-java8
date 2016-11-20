@@ -2,6 +2,7 @@ package cc.before30.example.tobytv004;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -23,6 +24,30 @@ public class WildCardGenerics {
 
     static class A {}
     static class B extends A {}
+
+    static boolean isEmpty(List<?> list) {
+        return list.size() == 0;
+    }
+
+    static <T> long frequency(List<T> list, T elem) {
+        return list.stream().filter(s -> s.equals(elem)).count();
+    }
+
+    static long frequencyWild(List<?> list, Object elem) {
+        return list.stream().filter(s -> s.equals(elem)).count();
+    }
+
+    private static Integer max(List<Integer> list) {
+//        list.stream().mapToInt(i -> i).max().getAsInt();
+//        list.stream().reduce((a, b) -> a.compareTo(b) > 0 ? a : b).get();
+        return list.stream().max(Integer::max).get();
+    }
+
+    // Super 하위 한정 :
+    // Extends 상위 한정 :
+    private static <T extends Comparable<? super T>> T maxWithGenerics(List<? extends T> list) {
+        return list.stream().reduce((a, b) -> a.compareTo(b) > 0 ? a : b).get();
+    }
 
     public static <T> void main(String[] args) {
         List<?> list; // ? : wildcards 아무거나 가능하다, 모른다, 알필요없다.
@@ -51,6 +76,16 @@ public class WildCardGenerics {
         // Collections method를 확인해보라
         // TO BE CONTINUED.
 
+        List<Integer> ints = Arrays.asList(1, 2, 3, 4, 5);
+        System.out.println(isEmpty(ints));
+        // Wildcard는 언제 사용가능할까?
+        List<Integer> ints2 = Arrays.asList(1, 2, 3, 4, 5, 3, 2);
+        System.out.println(frequency(ints2, 3));
+        System.out.println(frequency(ints2, 1));
+        System.out.println(frequency(ints2, 0));
+
+        List<Integer> nulList = Arrays.asList(1);
+        System.out.println(max(nulList));
 
     }
 }
