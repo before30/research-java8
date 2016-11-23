@@ -67,7 +67,7 @@ class HelloController {
 	@Autowired
 	TeamDao teamDao;
 
-	@RequestMapping("/teams/{name}")
+	@RequestMapping("/hi-teams/{name}")
 	public Team hiTherer(@PathVariable String name) {
 
 		return teamDao.findByName(name);
