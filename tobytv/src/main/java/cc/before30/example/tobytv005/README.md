@@ -25,3 +25,7 @@ GRPC
 www.grpc.io
 
 에릭마이어 - Observable 들어보면 좋다
+https://channel9.msdn.com/Blogs/Charles/Erik-Meijer-Rx-in-15-Minutes
+
+http://reactivex.io/
+
