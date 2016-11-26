@@ -8,6 +8,15 @@ import java.util.concurrent.Executors;
 /**
  * Created by before30 on 26/11/2016.
  */
+
+/*
+문제점
+1. Complete???
+2. Error???
+이런 경우를 전달하고 싶을때 Observer Pattern을 바로 사용할 수 없었다
+그래서 reactive에서 이걸 해결하려고 Observerble Pattern을 새로 정의 했다.
+
+ */
 public class ObWithThread {
 
     static class IntObservable extends Observable implements Runnable {
