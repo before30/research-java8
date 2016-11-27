@@ -33,4 +33,7 @@ repositories {
 dependencies {
 	compile('org.springframework.boot:spring-boot-starter')
 	testCompile('org.springframework.boot:spring-boot-starter-test')
+	compile "org.reactivestreams:reactive-streams:1.0.0"
+	testCompile "org.reactivestreams:reactive-streams-tck:1.0.0"
+
 }
