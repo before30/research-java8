@@ -29,3 +29,5 @@ https://channel9.msdn.com/Blogs/Charles/Erik-Meijer-Rx-in-15-Minutes
 
 http://reactivex.io/
 
+http://akarnokd.blogspot.kr/2015/06/the-reactive-streams-api-part-1.html
+
