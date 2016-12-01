@@ -75,6 +75,7 @@ public class PubSubExample {
 		}
 
 		@Override public void onComplete() {
+
 			System.out.println("onComplete ");
 		}
 	}
