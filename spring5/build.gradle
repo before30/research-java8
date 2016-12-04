@@ -1,9 +1,11 @@
 buildscript {
 	ext {
-		springBootVersion = '1.4.2.RELEASE'
+		springBootVersion = '2.0.0.BUILD-SNAPSHOT'
 	}
 	repositories {
 		mavenCentral()
+		maven { url "https://repo.spring.io/snapshot" }
+		maven { url "https://repo.spring.io/milestone" }
 	}
 	dependencies {
 		classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
@@ -15,7 +17,7 @@ apply plugin: 'eclipse'
 apply plugin: 'org.springframework.boot'
 
 jar {
-	baseName = 'tobytv'
+	baseName = 'spring5'
 	version = '0.0.1-SNAPSHOT'
 }
 sourceCompatibility = 1.8
@@ -23,12 +25,14 @@ targetCompatibility = 1.8
 
 repositories {
 	mavenCentral()
+	maven { url "https://repo.spring.io/snapshot" }
+	maven { url "https://repo.spring.io/milestone" }
 }
 
 
 dependencies {
-	compile('org.springframework.boot:spring-boot-starter')
 	compile('org.springframework.boot:spring-boot-starter-web')
+	testCompile('org.springframework.boot:spring-boot-starter-test')
 	compile('org.reactivestreams:reactive-streams:1.0.0')
 	compile('org.reactivestreams:reactive-streams-tck:1.0.0')
 	compile('org.springframework.boot:spring-boot-starter-logging')
@@ -38,6 +42,4 @@ dependencies {
 	compile group: 'org.projectlombok', name: 'lombok', version: '1.16.10'
 	// https://mvnrepository.com/artifact/io.projectreactor/reactor-core
 	compile group: 'io.projectreactor', name: 'reactor-core', version: '3.0.3.RELEASE'
-
-	testCompile('org.springframework.boot:spring-boot-starter-test')
 }
