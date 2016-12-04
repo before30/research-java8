@@ -1,8 +1,8 @@
 package cc.before30;
 
-import cc.before30.domain.Player;
-import cc.before30.domain.Team;
-import cc.before30.domain.dao.TeamDao;
+import cc.before30.example.domain.Player;
+import cc.before30.example.domain.Team;
+import cc.before30.example.domain.dao.TeamDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

@@ -1,4 +1,4 @@
-package cc.before30.config;
+package cc.before30.example.config;
 
 
 import org.springframework.context.annotation.Configuration;

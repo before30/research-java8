@@ -1,6 +1,6 @@
-package cc.before30.domain.dao;
+package cc.before30.example.domain.dao;
 
-import cc.before30.domain.Team;
+import cc.before30.example.domain.Team;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.rest.core.annotation.RestResource;
 

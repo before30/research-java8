@@ -1,7 +1,7 @@
-package cc.before30.controller;
+package cc.before30.example.controller;
 
-import cc.before30.domain.Team;
-import cc.before30.domain.dao.TeamDao;
+import cc.before30.example.domain.Team;
+import cc.before30.example.domain.dao.TeamDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;

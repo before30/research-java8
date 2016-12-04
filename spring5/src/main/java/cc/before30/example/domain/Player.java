@@ -1,4 +1,4 @@
-package cc.before30.domain;
+package cc.before30.example.domain;
 
 import lombok.Getter;
 import lombok.Setter;
