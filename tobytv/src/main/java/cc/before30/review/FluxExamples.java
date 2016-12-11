@@ -25,13 +25,21 @@ public class FluxExamples {
 
         final Flux<Long> numSrc = Flux.fromIterable(IterNum::new)
                                         .publishOn(Schedulers.newSingle("numSrc"));
+
+        final Flux<Long> numSrc2 = Flux.fromIterable(IterNum::new)
+                .publishOn(Schedulers.newSingle("numSrc2"));
+
         final Flux<Character> charSrc = Flux.fromIterable(IterChar::new)
                                             .publishOn(Schedulers.newSingle("charSrc"));
 
-        Flux.combineLatest(numSrc, charSrc, (n, c) -> Tuples.of(n, c))
-                .log()
-                .subscribe(System.out::println);
+//        Flux.combineLatest(numSrc, charSrc, (n, c) -> Tuples.of(n, c))
+//                .log()
+//                .subscribe(System.out::println);
 
+        Flux.combineLatest((v) -> Tuples.of(v[0], v[1]), numSrc, numSrc2)
+                .log()
+                .subscribeOn(Schedulers.newSingle("subs1"))
+                .subscribe(System.out::println);
 //        TimeUnit.SECONDS.sleep(10);
     }
 }
