@@ -33,6 +33,14 @@ public class HigherOrderFunctionEx {
         final List<Integer> list = Arrays.asList(1, 2, 3, 4, 5);
         List<String> map = map(list, i -> "$" + i);
         System.out.println(map);
+
+        Function<Integer, Function<Integer, Integer>> f3 = i1 -> i2 -> i1 + i2;
+        Function<Integer, Integer> plus10 = f3.apply(10);
+        System.out.println(plus10.apply(1));
+        System.out.println(plus10.apply(2));
+        System.out.println(plus10.apply(3));
+        System.out.println(plus10.apply(4));
+
     }
 
     private static <T, R> List<R> map(List<T> list, Function<T, R> mapper) {
