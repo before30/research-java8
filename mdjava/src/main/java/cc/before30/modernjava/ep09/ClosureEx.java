@@ -33,7 +33,7 @@ public class ClosureEx {
                 System.out.println(number);
             }
         });
-        
+
     }
 
     private static void testClouser(final String name, Runnable runnable) {
