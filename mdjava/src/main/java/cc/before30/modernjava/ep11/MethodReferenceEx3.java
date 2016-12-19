@@ -52,6 +52,26 @@ public class MethodReferenceEx3 {
         for (final Function<Integer, String> f : fmrL) {
             System.out.println(f.apply(3));
         }
+
+        final Function<Integer, String> fl2 = i -> String.valueOf(i * 2);
+
+        final Function<Integer, String> fmr2 = MethodReferenceEx3::doubleThenToString;
+
+
+        final List<Function<Integer, String>> functions = Arrays.asList(
+                i -> String.valueOf(i * 2),
+                MethodReferenceEx3::doubleThenToString,
+                i -> "#" + i,
+                MethodReferenceEx3::withHash
+        );
+
+        for (final Function<Integer, String> f : functions) {
+            System.out.println(f.apply(100));
+        }
+    }
+
+    private static String withHash(int n) {
+        return "#" + n;
     }
 
     private static Function<Integer, String> getDoubleThenToStringUsingMethodReference() {
