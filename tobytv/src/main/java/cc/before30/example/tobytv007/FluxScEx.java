@@ -1,10 +1,15 @@
 package cc.before30.example.tobytv007;
 
 import lombok.extern.slf4j.Slf4j;
+import org.reactivestreams.Publisher;
+import org.reactivestreams.Subscriber;
+import org.reactivestreams.Subscription;
 import reactor.core.publisher.Flux;
 import reactor.core.scheduler.Schedulers;
 
 import java.time.Duration;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -13,6 +18,31 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 public class FluxScEx {
     public static void main(String[] args) throws InterruptedException {
+
+//        Flux.range(1, 10)
+//            .log()
+//            .map(FluxScEx::intToString)
+//            .subscribe(System.out::println);
+//        Publisher<Integer> pub = sub -> {
+//            sub.onSubscribe(new Subscription() {
+//
+//                @Override public void request(long n) {
+//
+//                }
+//
+//                @Override public void cancel() {
+//
+//                }
+//            };
+//        };
+
+        Flux.range(1, 10)
+            .log()
+            .publishOn(Schedulers.newParallel("test", 10))
+            .flatMap(i -> Flux.just(i).map(FluxScEx::intToString), 10)
+            .log()
+
+            .subscribe(System.out::println);
 //        Flux.range(1, 10)
 //                .subscribe(System.out::println);
 //
@@ -43,12 +73,29 @@ public class FluxScEx {
         // interval의 timer thread는.. user thread가 아닌 daemon thread를 만든다
         // JVM은 user thread가 남아 있지 않으면 종료
         // daemon thread는 .... 상관없이 종료
-        Flux.interval(Duration.ofMillis(500))
-                .take(10)
-                .subscribe(s -> log.debug("onNext:{}", s));
+//        Flux.interval(Duration.ofMillis(500))
+//                .take(10)
+//                .subscribe(s -> log.debug("onNext:{}", s));
 
         log.debug("exit");
         TimeUnit.SECONDS.sleep(10);
 
+    }
+
+    private static String intToString(int i) {
+        try {
+            TimeUnit.SECONDS.sleep(1);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        return String.valueOf(i);
+    }
+    private static void printWithSleep(int i) {
+        try {
+            TimeUnit.SECONDS.sleep(1);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        System.out.println(i);
     }
 }
