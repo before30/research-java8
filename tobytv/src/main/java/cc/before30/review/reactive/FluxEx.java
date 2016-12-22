@@ -27,16 +27,21 @@ public class FluxEx {
 //				log.info("Consumed: " + value);
 //			});
 
+//		Flux.range(1, 10)
+////			.log()
+////			.map(FluxEx::intToString)
+//			.flatMap(value -> Mono.just(value)
+//				.log()
+////				.publishOn(Schedulers.newParallel("mono", 5))
+//				.map(FluxEx::intToString)
+//				, 5
+//			)
+////			.subscribeOn(Schedulers.parallel())
+//			.subscribe(value -> log.info("{}", value));
+
 		Flux.range(1, 10)
-//			.log()
-//			.map(FluxEx::intToString)
-			.flatMap(value -> Mono.just(value)
-				.publishOn(Schedulers.newParallel("mono", 5))
-				.map(FluxEx::intToString)
-				, 5
-			)
-//			.subscribeOn(Schedulers.parallel())
-			.subscribe(value -> log.info("{}", value));
+			.flatMap(v -> Mono.fromCallable(() -> intToString(v)).subscribeOn(Schedulers.elastic()), 10)
+			.subscribe(log::info);
 
 		try {
 			TimeUnit.SECONDS.sleep(100);
