@@ -38,6 +38,6 @@ dependencies {
 	compile group: 'org.projectlombok', name: 'lombok', version: '1.16.10'
 	// https://mvnrepository.com/artifact/io.projectreactor/reactor-core
 	compile group: 'io.projectreactor', name: 'reactor-core', version: '3.0.3.RELEASE'
-
+	compile group: 'io.projectreactor.addons', name: 'reactor-test', version: '3.0.3.RELEASE'
 	testCompile('org.springframework.boot:spring-boot-starter-test')
 }
