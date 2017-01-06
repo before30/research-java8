@@ -1,0 +1,19 @@
+server:
+  port: 8080
+  tomcat:
+    max-threads: 1
+threadPool:
+  db:
+    init_size: 5
+    max_size: 50
+    queue_size: 100000
+
+sp:
+  server:
+    port: 8090
+  non_blocking:
+    url: http://localhost:${sp.server.port}/process-non-blocking
+aggregator:
+  timeoutMs: 3000
+statistics:
+  requestPerLog: 50000
