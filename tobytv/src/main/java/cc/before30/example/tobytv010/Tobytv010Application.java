@@ -42,47 +42,47 @@ public class Tobytv010Application {
             Completion
                     .from(rt.getForEntity(url1, String.class, "h" +idx))
                     .andApply(s -> rt.getForEntity(url2, String.class, s.getBody()))
-//                    .andApply(s -> myService.work(s.getBody()))
+                    .andApply(s -> myService.work(s.getBody()))
                     .andError(e -> dr.setErrorResult(e))
-                    .andAccept(s -> dr.setResult(s.getBody()));
+                    .andAccept(s -> dr.setResult(s));
 
             return dr;
         }
     }
 
-    public static class AcceptCompletion extends Completion {
-        public Consumer<ResponseEntity<String>> con;
-        public AcceptCompletion(Consumer<ResponseEntity<String>> con) {
+    public static class AcceptCompletion<S> extends Completion<S, Void> {
+        public Consumer<S> con;
+        public AcceptCompletion(Consumer<S> con) {
             this.con = con;
         }
 
         @Override
-        void run(ResponseEntity<String> value) {
+        void run(S value) {
             con.accept(value);
         }
     }
 
-    public static class ApplyCompletion extends Completion {
-        public Function<ResponseEntity<String>, ListenableFuture<ResponseEntity<String>>> fn;
-        public ApplyCompletion(Function<ResponseEntity<String>, ListenableFuture<ResponseEntity<String>>> fn) {
+    public static class ApplyCompletion<S, T> extends Completion<S, T> {
+        public Function<S, ListenableFuture<T>> fn;
+        public ApplyCompletion(Function<S, ListenableFuture<T>> fn) {
             this.fn = fn;
         }
 
         @Override
-        void run(ResponseEntity<String> value) {
-            ListenableFuture<ResponseEntity<String>> lf = fn.apply(value);
+        void run(S value) {
+            ListenableFuture<T> lf = fn.apply(value);
             lf.addCallback(s -> complete(s), e -> error(e));
         }
     }
 
-    public static class ErrorCompletion extends Completion {
+    public static class ErrorCompletion<T> extends Completion<T, T> {
         public Consumer<Throwable> econ;
         public ErrorCompletion(Consumer<Throwable> econ) {
             this.econ = econ;
         }
 
         @Override
-        void run(ResponseEntity<String> value) {
+        void run(T value) {
             if (next != null) next.run(value);
         }
 
@@ -92,32 +92,32 @@ public class Tobytv010Application {
         }
     }
 
-    public static class Completion {
+    public static class Completion<S, T> {
         Completion next;
 
 
-        public void andAccept(Consumer<ResponseEntity<String>> con) {
-            Completion c = new AcceptCompletion(con);
+        public void andAccept(Consumer<T> con) {
+            Completion<T, Void> c = new AcceptCompletion(con);
             this.next = c;
 
         }
 
-        public Completion andError(Consumer<Throwable> econ) {
-            Completion c = new ErrorCompletion(econ);
+        public Completion<T, T> andError(Consumer<Throwable> econ) {
+            Completion<T, T> c = new ErrorCompletion<>(econ);
 
             return c;
         }
 
-        public Completion andApply(Function<ResponseEntity<String>, ListenableFuture<ResponseEntity<String>>> fn) {
-            Completion c = new ApplyCompletion(fn);
+        public <V> Completion<T, V> andApply(Function<T, ListenableFuture<V>> fn) {
+            Completion<T, V> c = new ApplyCompletion<>(fn);
             this.next = c;
 
             return c;
 
         }
 
-        public static Completion from(ListenableFuture<ResponseEntity<String>> lf) {
-            Completion c = new Completion();
+        public static <S, T> Completion<S, T> from(ListenableFuture<T> lf) {
+            Completion<S, T> c = new Completion<>();
             lf.addCallback(s -> {
                 c.complete(s);
             }, f -> {
@@ -131,11 +131,11 @@ public class Tobytv010Application {
             if (next != null) next.error(e);
         }
 
-        void complete(ResponseEntity<String> s) {
+        void complete(T s) {
             if (next != null) next.run(s);
         }
 
-        void run(ResponseEntity<String> value) {
+        void run(S value) {
 
         }
     }
