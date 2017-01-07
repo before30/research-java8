@@ -9,13 +9,11 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.stereotype.Service;
 import org.springframework.util.concurrent.ListenableFuture;
-import org.springframework.util.concurrent.ListenableFutureCallback;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.AsyncRestTemplate;
 import org.springframework.web.context.request.async.DeferredResult;
 
-import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -34,9 +32,7 @@ public class Tobytv010Application {
         AsyncRestTemplate rt = new AsyncRestTemplate(new Netty4ClientHttpRequestFactory(new NioEventLoopGroup(1)));
 
         @GetMapping("/rest")
-//        public ListenableFuture<ResponseEntity<String>> rest(int idx) {
         public DeferredResult<String> rest(int idx) {
-//            String res = rt.getForObject("http://localhost:8081/service?req={req}", String.class, "hello" + idx);
             String url1 = "http://localhost:8081/service?req={req}";
             String url2 = "http://localhost:8081/service2?req={req}";
 
@@ -46,64 +42,53 @@ public class Tobytv010Application {
             Completion
                     .from(rt.getForEntity(url1, String.class, "h" +idx))
                     .andApply(s -> rt.getForEntity(url2, String.class, s.getBody()))
+//                    .andApply(s -> myService.work(s.getBody()))
+                    .andError(e -> dr.setErrorResult(e))
                     .andAccept(s -> dr.setResult(s.getBody()));
-
-//            ListenableFuture<ResponseEntity<String>> f1 = rt.getForEntity(url1, String.class, idx);
-//            f1.addCallback(s1 -> {
-//                ListenableFuture<ResponseEntity<String>> f2 = rt.getForEntity(url2, String.class, s1.getBody());
-//                f2.addCallback(s2 -> {
-//                    ListenableFuture<String> f3 = myService.work(s2.getBody());
-//                    f3.addCallback(s3 -> {
-//                        dr.setResult(s3);
-//                    }, e -> {
-//                        dr.setErrorResult(e.getMessage());
-//                    });
-//                }, e -> {
-//                    dr.setErrorResult(e.getMessage());
-//                });
-//            }, e -> {
-//                dr.setErrorResult(e.getMessage());
-//            });
 
             return dr;
         }
+    }
 
-        @GetMapping("/rest2")
-        public CompletableFuture<String> rest2(int idx) {
-            String url1 = "http://localhost:8081/service?req={req}";
-            String url2 = "http://localhost:8081/service2?req={req}";
-
-            return buildCompletableFuture(rt.getForEntity(url1, String.class, idx))
-                    .thenCompose(r -> buildCompletableFuture(rt.getForEntity(url2, String.class, r)))
-                    .exceptionally(ex -> ex.getMessage());
+    public static class AcceptCompletion extends Completion {
+        public Consumer<ResponseEntity<String>> con;
+        public AcceptCompletion(Consumer<ResponseEntity<String>> con) {
+            this.con = con;
         }
 
+        @Override
+        void run(ResponseEntity<String> value) {
+            con.accept(value);
+        }
+    }
 
-        <T> CompletableFuture<T> buildCompletableFuture(final ListenableFuture<ResponseEntity<T>> listenableFuture) {
-            CompletableFuture<T> completableFuture = new CompletableFuture<T>() {
-                @Override
-                public boolean cancel(boolean mayInterruptIfRunning) {
-                    boolean result = listenableFuture.cancel(mayInterruptIfRunning);
-                    super.cancel(mayInterruptIfRunning);
-                    return result;
-                }
-            };
+    public static class ApplyCompletion extends Completion {
+        public Function<ResponseEntity<String>, ListenableFuture<ResponseEntity<String>>> fn;
+        public ApplyCompletion(Function<ResponseEntity<String>, ListenableFuture<ResponseEntity<String>>> fn) {
+            this.fn = fn;
+        }
 
-            // add callback
-            listenableFuture.addCallback(new ListenableFutureCallback<ResponseEntity<T>>() {
-                @Override
-                public void onSuccess(ResponseEntity<T> result) {
-                    completableFuture.complete(result.getBody());
-                }
+        @Override
+        void run(ResponseEntity<String> value) {
+            ListenableFuture<ResponseEntity<String>> lf = fn.apply(value);
+            lf.addCallback(s -> complete(s), e -> error(e));
+        }
+    }
 
-                @Override
-                public void onFailure(Throwable ex) {
-                    completableFuture.completeExceptionally(ex);
-                }
+    public static class ErrorCompletion extends Completion {
+        public Consumer<Throwable> econ;
+        public ErrorCompletion(Consumer<Throwable> econ) {
+            this.econ = econ;
+        }
 
-            });
+        @Override
+        void run(ResponseEntity<String> value) {
+            if (next != null) next.run(value);
+        }
 
-            return completableFuture;
+        @Override
+        void error(Throwable e) {
+            econ.accept(e);
         }
     }
 
@@ -111,29 +96,20 @@ public class Tobytv010Application {
         Completion next;
 
 
-        public Completion() {
-
-        }
-
-        public Consumer<ResponseEntity<String>> con;
-        public Completion(Consumer<ResponseEntity<String>> con) {
-            this.con = con;
-        }
-
-        public Function<ResponseEntity<String>, ListenableFuture<ResponseEntity<String>>> fn;
-        public Completion(Function<ResponseEntity<String>, ListenableFuture<ResponseEntity<String>>> fn) {
-            this.fn = fn;
-        }
-
-
         public void andAccept(Consumer<ResponseEntity<String>> con) {
-            Completion c = new Completion(con);
+            Completion c = new AcceptCompletion(con);
             this.next = c;
 
         }
 
+        public Completion andError(Consumer<Throwable> econ) {
+            Completion c = new ErrorCompletion(econ);
+
+            return c;
+        }
+
         public Completion andApply(Function<ResponseEntity<String>, ListenableFuture<ResponseEntity<String>>> fn) {
-            Completion c = new Completion(fn);
+            Completion c = new ApplyCompletion(fn);
             this.next = c;
 
             return c;
@@ -151,19 +127,16 @@ public class Tobytv010Application {
             return c;
         }
 
+        void error(Throwable e) {
+            if (next != null) next.error(e);
+        }
+
         void complete(ResponseEntity<String> s) {
             if (next != null) next.run(s);
         }
 
         void run(ResponseEntity<String> value) {
-            if (con != null) con.accept(value);
-            else if (fn != null) {
-                ListenableFuture<ResponseEntity<String>> lf = fn.apply(value);
-                lf.addCallback(s -> complete(s), e -> error(e));
-            }
-        }
 
-        void error(Throwable e) {
         }
     }
 
