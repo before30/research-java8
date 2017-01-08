@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.AsyncRestTemplate;
 import org.springframework.web.context.request.async.DeferredResult;
 
-import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -45,6 +44,7 @@ public class MyWeek10App {
             MyCompletion
                     .from(restTemplate.getForEntity(URL_1, String.class, "h" + idx))
                     .andApply(s -> restTemplate.getForEntity(URL_2, String.class, s.getBody()))
+                    .andError(e -> result.setErrorResult(e))
                     .andAccept(s -> result.setResult(s.getBody()));
 
             return result;
@@ -80,6 +80,23 @@ public class MyWeek10App {
         }
     }
 
+    public static class ErrorMyCompletion extends MyCompletion {
+        Consumer<Throwable> econ;
+        public ErrorMyCompletion(Consumer<Throwable> econ) {
+            this.econ = econ;
+        }
+
+        @Override
+        void run(ResponseEntity<String> value) {
+            if (next != null) next.run(value);
+        }
+
+        @Override
+        void error(Throwable e) {
+            econ.accept(e);
+        }
+    }
+
     public static class MyCompletion {
         MyCompletion next;
 
@@ -87,10 +104,15 @@ public class MyWeek10App {
 
         }
 
-
-
         public MyCompletion andApply(Function<ResponseEntity<String>, ListenableFuture<ResponseEntity<String>>> fn) {
             MyCompletion c = new ApplyMyCompletion(fn);
+            this.next = c;
+
+            return c;
+        }
+
+        public MyCompletion andError(Consumer<Throwable> econ) {
+            MyCompletion c = new ErrorMyCompletion(econ);
             this.next = c;
 
             return c;
@@ -100,6 +122,7 @@ public class MyWeek10App {
             MyCompletion c = new AcceptMyCompletion(consumer);
             next = c;
         }
+
 
         public static MyCompletion from(ListenableFuture<ResponseEntity<String>> listenableFuture) {
             MyCompletion c = new MyCompletion();
@@ -112,6 +135,7 @@ public class MyWeek10App {
         }
 
         void error(Throwable e) {
+            if (next != null) next.error(e);
         }
 
         void complete(ResponseEntity<String> s) {
