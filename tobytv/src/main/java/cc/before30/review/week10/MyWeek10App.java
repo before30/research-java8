@@ -19,6 +19,7 @@ import org.springframework.web.context.request.async.DeferredResult;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 /**
  * Created by before30 on 08/01/2017.
@@ -43,6 +44,7 @@ public class MyWeek10App {
 
             MyCompletion
                     .from(restTemplate.getForEntity(URL_1, String.class, "h" + idx))
+                    .andApply(s -> restTemplate.getForEntity(URL_2, String.class, s.getBody()))
                     .andAccept(s -> result.setResult(s.getBody()));
 //            ListenableFuture<ResponseEntity<String>> f1 = restTemplate.getForEntity(URL_1, String.class, idx);
 //            f1.addCallback(s1 -> {
@@ -77,6 +79,18 @@ public class MyWeek10App {
             this.consumer = consumer;
         }
 
+        Function<ResponseEntity<String>, ListenableFuture<ResponseEntity<String>>> fn;
+        public MyCompletion(Function<ResponseEntity<String>, ListenableFuture<ResponseEntity<String>>> fn) {
+            this.fn = fn;
+        }
+
+        public MyCompletion andApply(Function<ResponseEntity<String>, ListenableFuture<ResponseEntity<String>>> fn) {
+            MyCompletion c = new MyCompletion(fn);
+            this.next = c;
+
+            return c;
+        }
+
         public void andAccept(Consumer<ResponseEntity<String>> consumer) {
             MyCompletion c = new MyCompletion(consumer);
             next = c;
@@ -101,6 +115,14 @@ public class MyWeek10App {
 
         void run(ResponseEntity<String> value) {
             if (consumer != null) consumer.accept(value);
+            else if (fn != null) {
+                ListenableFuture<ResponseEntity<String>> lf = fn.apply(value);
+                lf.addCallback(s -> {
+                    complete(s);
+                }, e -> {
+                    error(e);
+                });
+            }
         }
     }
 
