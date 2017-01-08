@@ -1,0 +1,24 @@
+1. Generic 사용하는 것으로 변경
+2. 처음부터 다시 짜보기
+3. CompletableFutre로 해당 내용 수정해보기
+
+
+https://gaming.youtube.com/watch?v=Tb43EyWTSlQ
+http://blog.paralleluniverse.co/2014/08/12/noasync/
+https://discuss.kotlinlang.org/t/how-to-avoid-callback-hell-or-pyramid-of-doom/216
+https://www.infoq.com/research/tackling-async-callback-hell
+
+http://www.codebulb.ch/2015/07/completablefuture-clean-callbacks-with-java-8s-promises-part-1.html
+http://www.codebulb.ch/2015/07/completablefuture-clean-callbacks-with-java-8s-promises-part-2.html
+http://www.codebulb.ch/2015/07/completablefuture-clean-callbacks-with-java-8s-promises-part-3.html
+http://www.codebulb.ch/2015/07/completablefuture-clean-callbacks-with-java-8s-promises-part-4.html
+
+http://www.slideshare.net/SpringCentral/futures-andrxobservables-springone2013
+
+https://gist.github.com/danveloper/5398943
+
+https://en.wikipedia.org/wiki/Continuation-passing_style
+
+https://www.cs.utah.edu/~mflatt/past-courses/cs6520/public_html/s02/cps.pdf
+
+https://github.com/callistaenterprise/blog-non-blocking-rest-service-with-spring-mvc
