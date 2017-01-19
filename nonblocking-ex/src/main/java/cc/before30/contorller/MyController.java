@@ -1,9 +1,12 @@
 package cc.before30.contorller;
 
 import com.sun.xml.internal.ws.util.CompletedFuture;
+import io.netty.channel.nio.NioEventLoopGroup;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.task.TaskDecorator;
+import org.springframework.http.ResponseEntity;
+import org.springframework.http.client.Netty4ClientHttpRequestFactory;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
@@ -11,6 +14,7 @@ import org.springframework.util.concurrent.ListenableFuture;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.AsyncRestTemplate;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.context.request.async.DeferredResult;
 
 import java.util.Queue;
@@ -87,21 +91,63 @@ public class MyController {
 //        };
 //    }
 
+//    @GetMapping("/rest")
+//    public DeferredResult<String> rest(String idx) {
+//        log.info("deferred result");
+//        DeferredResult<String> dr = new DeferredResult<>();
+//
+//        Executors.newSingleThreadExecutor().submit(() -> {
+//            try {
+//                TimeUnit.SECONDS.sleep(2);
+//            } catch (InterruptedException e) {
+//                e.printStackTrace();
+//            }
+//            dr.setResult(idx + "/rest");
+//        });
+//
+//        return dr;
+//    }
+
+//    Queue<DeferredResult<String>> results = new ConcurrentLinkedDeque<>();
+//
+//    @GetMapping("/rest")
+//    public DeferredResult<String> rest(String idx) {
+//        DeferredResult<String> deferredResult = new DeferredResult<>();
+//        results.add(deferredResult);
+//
+//        return deferredResult;
+//    }
+//
+//    @GetMapping("/rest/count")
+//    public String count() {
+//        return String.valueOf(results.size());
+//    }
+//
+//    @GetMapping("/rest/event")
+//    public String event(String msg) {
+//        for(DeferredResult<String> dr : results) {
+//            dr.setResult("Hello " + msg);
+//            results.remove(dr);
+//        }
+//        return "OK";
+//    }
+
+    AsyncRestTemplate restTemplate = new AsyncRestTemplate(new Netty4ClientHttpRequestFactory(new NioEventLoopGroup(1)));
+    String url1 = "http://localhost:8888/service?req={req}";
+
     @GetMapping("/rest")
     public DeferredResult<String> rest(String idx) {
-        log.info("deferred result");
-        DeferredResult<String> dr = new DeferredResult<>();
-
-        Executors.newSingleThreadExecutor().submit(() -> {
-            try {
-                TimeUnit.SECONDS.sleep(2);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            dr.setResult(idx + "/rest");
+        DeferredResult<String> result = new DeferredResult<>();
+        ListenableFuture<ResponseEntity<String>> response = restTemplate.getForEntity(url1, String.class, idx);
+        response.addCallback(s -> {
+            result.setResult(s.getBody());
+        }, e -> {
+            result.setErrorResult(e.getMessage());
         });
 
-        return dr;
+
+        return result;
+
     }
 
 //    @GetMapping("/rest")
