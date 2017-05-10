@@ -10,7 +10,7 @@ public class BeforeSecretLeaseRevocationEvent extends SecretLeaseEvent {
 
     private static final long serialVersionUID = 1L;
 
-    protected BeforeSecretLeaseRevocationEvent(RequestedSecret requestedSecret, Lease lease) {
+    public BeforeSecretLeaseRevocationEvent(RequestedSecret requestedSecret, Lease lease) {
         super(requestedSecret, lease);
     }
 }

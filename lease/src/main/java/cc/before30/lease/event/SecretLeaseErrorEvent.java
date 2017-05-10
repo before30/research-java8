@@ -14,7 +14,7 @@ public class SecretLeaseErrorEvent extends SecretLeaseEvent {
 
     private final Throwable exception;
 
-    protected SecretLeaseErrorEvent(RequestedSecret requestedSecret, Lease lease, Throwable exception) {
+    public SecretLeaseErrorEvent(RequestedSecret requestedSecret, Lease lease, Throwable exception) {
         super(requestedSecret, lease);
         this.exception = exception;
     }

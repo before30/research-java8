@@ -10,7 +10,7 @@ public class SecretLeaseExpiredEvent extends SecretLeaseEvent {
 
     private static final long serialVersionUID = 1L;
 
-    protected SecretLeaseExpiredEvent(RequestedSecret requestedSecret, Lease lease) {
+    public SecretLeaseExpiredEvent(RequestedSecret requestedSecret, Lease lease) {
         super(requestedSecret, lease);
     }
 }
