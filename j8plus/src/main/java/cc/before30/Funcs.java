@@ -1,10 +1,10 @@
 package cc.before30;
 
-import cc.before30.types.Predicate3;
+import cc.before30.types.*;
 
 import java.util.Comparator;
 import java.util.Objects;
-import java.util.function.BiPredicate;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
@@ -55,7 +55,7 @@ public class Funcs {
         return t -> Boolean.FALSE;
     }
 
-    public static <O, T> Predicate <O> satisfying(final BiPredicate<? super O, ? super T> predicate,
+    public static <O, T> Predicate <O> satisfying(final Predicate2<? super O, ? super T> predicate,
                                                  final T param1) {
         Objects.requireNonNull(predicate, "The function cannot be null.");
         return object -> predicate.test(object, param1);
@@ -67,4 +67,78 @@ public class Funcs {
         Objects.requireNonNull(predicate, "The function cannot be null.");
         return object -> predicate.test(object, param1, param2);
     }
+
+    public static <O, T, T2, T3> Predicate<O> satisfying(final Predicate4<? super O, ? super T, ? super T2, ? super T3> predicate,
+                                                         final T param1,
+                                                         final T2 param2,
+                                                         final T3 param3) {
+        Objects.requireNonNull(predicate, "The function cannot be null.");
+        return object -> predicate.test(object, param1, param2, param3);
+    }
+
+    public static <O, T, T2, T3, T4> Predicate<O> satisfying(final Predicate5<? super O, ? super T, ? super T2, ? super T3, ? super T4> predicate,
+                                                             final T param1,
+                                                             final T2 param2,
+                                                             final T3 param3,
+                                                             final T4 param4) {
+        Objects.requireNonNull(predicate, "The function cannot be null.");
+        return object -> predicate.test(object, param1, param2, param3, param4);
+    }
+
+    public static <O, T, R> Function<O, R> applying(final Function2<? super O, ? super T, ? extends R> function, final T param) {
+        Objects.requireNonNull(function, "The function cannot be null.");
+        return object -> function.apply(object, param);
+    }
+
+    public static <O, T, T2, R> Function<O, R> applying(final Function3<? super O, ? super T, ? super T2, ? extends R> function, final T param1, final T2 param2) {
+        Objects.requireNonNull(function, "The function cannot be null.");
+        return object -> function.apply(object, param1, param2);
+    }
+
+    public static <O, T, T2, T3, R> Function<O, R> applying(final Function4<? super O, ? super T, ? super T2, ? super T3, ? extends R> function,
+                                                            final T param1,
+                                                            final T2 param2,
+                                                            final T3 param3) {
+        Objects.requireNonNull(function, "The function cannot be null.");
+        return object -> function.apply(object, param1, param2, param3);
+    }
+
+    public static <O, T, T2, T3, T4, R> Function<O, R> applying(final Function5<? super O, ? super T, ? super T2, ? super T3, ? super T4, ? extends R> function,
+                                                                final T param1,
+                                                                final T2 param2,
+                                                                final T3 param3,
+                                                                final T4 param4) {
+        Objects.requireNonNull(function, "The function cannot be null.");
+        return object -> function.apply(object, param1, param2, param3, param4);
+    }
+
+    public static <O, T> Consumer<O> accepting(final Consumer2<? super O, ? super T> function, final T param) {
+        Objects.requireNonNull(function, "The function cannot be null.");
+        return object -> function.accept(object, param);
+    }
+
+    public static <O, T, T2> Consumer<O> accepting(final Consumer3<? super O, ? super T, ? super T2> function, final T param1, final T2 param2) {
+        Objects.requireNonNull(function, "The function cannot be null.");
+        return object -> function.accept(object, param1, param2);
+    }
+
+    public static <O, T, T2, T3> Consumer<O> accepting(final Consumer4<? super O, ? super T, ? super T2, ? super T3> function,
+                                                       final T param1,
+                                                       final T2 param2,
+                                                       final T3 param3) {
+        Objects.requireNonNull(function, "The function cannot be null.");
+        return object -> function.accept(object, param1, param2, param3);
+    }
+
+    public static <O, T, T2, T3, T4> Consumer<O> accepting(final Consumer5<? super O, ? super T, ? super T2, ? super T3, ? super T4> function,
+                                                           final T param1,
+                                                           final T2 param2,
+                                                           final T3 param3,
+                                                           final T4 param4) {
+        Objects.requireNonNull(function, "The function cannot be null.");
+        return object -> function.accept(object, param1, param2, param3, param4);
+    }
+
+
+
 }
